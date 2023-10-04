@@ -1,18 +1,36 @@
 ---
 title: "Lobster Report"
+Authors: "Soraida Garcia and Beatriz Mejia Mercado"
 format: html
 ---
-## “Exercise: Explore, Clean, and Wrangle Data”
+
+## Exercise: Explore, Clean, and Wrangle Data
+
+
+### Abstract
+
+Data on abundance, size and fishing pressure of California spiny lobster (Panulirus interrupt) are collected along the mainland coast of the Santa Barbara Channel. Spiny lobsters are an important predator in giant kelp forests off southern California. Two SBC LTER study reefs are located in or near the California Fish and Game Network of Marine Protected Areas (MPA), Naples and Isla Vista, both established as MPAs on 2012-01-01. MPAs provide a unique opportunity to investigate the effects of fishing on kelp forest community dynamics. Sampling began in 2012 and is ongoing.
+
+### Set up
 
 ```{r}
+#| warning: false
+#| message: false
+
 library(readr)
 library(dplyr)
 library(ggplot2)
 library(tidyr)
+```
 
-lobster_abundance<-read.csv("../data/Lobster_Abundance_All_Years_20220829.csv")
+### Read the data - Abundance
 
+```{r}
+lobster_abundance <- read.csv("../Beatriz-Soraida/data/Lobster_Abundance_All_Years_20220829.csv")
+```
 
+### Exploring the data
+```{r}
 lobster_abundance <- lobster_abundance %>% 
     mutate(SIZE_MM = na_if(SIZE_MM, -99999))
 
@@ -22,16 +40,14 @@ not_napl <- lobster_abundance %>%
 aque_70mm <- lobster_abundance %>% 
     filter(SITE == "AQUE", SIZE_MM >= 70)
 
-
-
 ```
 
-## “Exercise: Data Visualization”
+
+## Exercise: Data Visualization
 
 ```{r}
 #| warning: false
 #| message: false
-#| echo: false
 
 ggplot(data = lobster_abundance, aes(x = SIZE_MM)) +
     geom_histogram() +
@@ -42,9 +58,6 @@ lobsters_summarize <- lobster_abundance %>%
   group_by(SITE, YEAR) %>% 
   summarize(COUNT = n()) %>%
   mutate(YEAR=as.factor(YEAR))  ##this eliminates the decimals
-
-
-
   
 
 lobster_size_lrg <- lobster_abundance %>% 
@@ -53,12 +66,17 @@ lobster_size_lrg <- lobster_abundance %>%
     group_by(SITE, SIZE_BIN) %>%
     summarize(COUNT = n()) %>%
     drop_na()
+```
 
-# bar plot
+
+### Bar plot
+```{r}
 ggplot(data = lobster_size_lrg, aes(x = SITE, y = COUNT, fill = SIZE_BIN)) +
     geom_col()
+```
 
-# dodged bar plot
+### Dodged bar plot
+```{r}
 ggplot(data = lobster_size_lrg, aes(x = SITE, y = COUNT, fill = SIZE_BIN)) +
     geom_col(position = "dodge")
 
@@ -66,9 +84,12 @@ ggplot(data = lobster_size_lrg, aes(x = SITE, y = COUNT, fill = SIZE_BIN)) +
 ```
 
 
+# Line and point plot
+
 ```{r}
-# line and point plot
-#| echo:true
+#| warning: false
+#| message: false
+
 ggplot(data = lobsters_summarize, aes(x = YEAR, y = COUNT)) +
   geom_point(aes(color = SITE)) +
   geom_line(aes(color = SITE)) + 
@@ -83,12 +104,127 @@ ggplot(data = lobsters_summarize, aes(x = YEAR, y = COUNT)) +
    ggtitle("Lobster Abundance")
 ```
 
+
+
+### Read the data - Trap counts
+
+```{r}
+#| warning: false
+
+lobster_traps <- read.csv("../Beatriz-Soraida/data/Lobster_Trap_Counts_All_Years_20210519.csv")
+```
+
+### Exploring the data
+
+```{r}
+glimpse(lobster_traps)
+
+
+summary(lobster_traps)
+
+```
+
+### Convert missing values using `mutate()` and `na_if()`
+
+```{r}
+lobster_traps <- lobster_traps %>% 
+  mutate(TRAPS = na_if(TRAPS, -99999))
+```
+
+
+### `filter()` practice
+
+```{r}
+not_napl <- lobster_traps %>% 
+  filter(SITE != "NAPL")
+```
+
+
+```{r}
+Carp_20_traps <- lobster_traps %>% 
+  filter(SITE == "CARP", TRAPS > 20)
+```
+
+
+## Exercise: Data Visualization
+
+```{r}
+
+ggplot(data = lobster_traps, aes(x = TRAPS))+
+  geom_histogram(bins = 15, na.rm = TRUE)+
+  facet_wrap( ~ YEAR)
+
+```
+
+```{r}
+#| message: false
+
+lobsters_traps_summarize <- lobster_traps %>% 
+  group_by(SITE, YEAR) %>% 
+  summarize(TOTAL_TRAPS = sum(TRAPS, na.rm = TRUE))
+```
+### line plot
+
+```{r}
+ggplot(data = lobsters_traps_summarize, aes(x = YEAR,
+                                          y = TOTAL_TRAPS))+
+  geom_line(aes(color = SITE))
+```
+
+### line and point plot
+
+```{r}
+ggplot(data = lobsters_traps_summarize, aes(x = YEAR,
+                                            y = TOTAL_TRAPS))+
+  geom_point(aes(color = SITE))+
+  geom_line(aes(color = SITE))
+```
+### Bar graph
+
+```{r}
+#| message: false
+
+lobster_traps_fishing_pressure <- lobster_traps %>% 
+  filter(YEAR %in% c(2019, 2020, 2021)) %>% 
+  mutate(FISHING_PRESSURE = if_else(TRAPS >=8,
+                                    true = "high",
+                                    false = "low")) %>% 
+  group_by(SITE, FISHING_PRESSURE) %>%
+  summarize(COUNT = n()) %>% 
+  drop_na()
+             
+```
+### Bar plot
+
+```{r}
+ggplot(data = lobster_traps_fishing_pressure,
+       aes(x = SITE,
+           y = COUNT,
+           fill = FISHING_PRESSURE))+
+  geom_col()+
+  scale_fill_viridis_d()+
+  theme(legend.position = "bottom")
+```
+
+### Dodged bar plot
+
+```{r}
+ggplot(data = lobster_traps_fishing_pressure,
+       aes(x = SITE,
+           y = COUNT,
+           fill = FISHING_PRESSURE))+
+  geom_col(position = "dodge")+
+  scale_fill_viridis_d()+
+  theme(legend.position = "bottom")
+```
+
+
+
+
 ## Citation 
 
 Santa Barbara Coastal LTER, D. Reed, and R. Miller. 2022. SBC LTER: Reef: Abundance, size and fishing effort for California Spiny Lobster (Panulirus interruptus), ongoing since 2012 ver 8. Environmental Data Initiative. https://doi.org/10.6073/pasta/25aa371650a671bafad64dd25a39ee18 (Accessed 2023-10-04).
 
-## Abstract
 
-Data on abundance, size and fishing pressure of California spiny lobster (Panulirus interrupt) are collected along the mainland coast of the Santa Barbara Channel. Spiny lobsters are an important predator in giant kelp forests off southern California. Two SBC LTER study reefs are located in or near the California Fish and Game Network of Marine Protected Areas (MPA), Naples and Isla Vista, both established as MPAs on 2012-01-01. MPAs provide a unique opportunity to investigate the effects of fishing on kelp forest community dynamics. Sampling began in 2012 and is ongoing.
 
 
