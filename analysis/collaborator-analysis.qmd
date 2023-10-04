@@ -109,7 +109,9 @@ ggplot(data = lobster_traps_fishing_pressure,
        aes(x = SITE,
            y = COUNT,
            fill = FISHING_PRESSURE))+
-  geom_col()
+  geom_col()+
+  scale_fill_viridis_d()+
+  theme(legend.position = "bottom")
 ```
 
 ### Dodged bar plot
@@ -119,6 +121,8 @@ ggplot(data = lobster_traps_fishing_pressure,
        aes(x = SITE,
            y = COUNT,
            fill = FISHING_PRESSURE))+
-  geom_col(position = "dodge")
+  geom_col(position = "dodge")+
+  scale_fill_viridis_d()+
+  theme(legend.position = "bottom")
 ```
 
