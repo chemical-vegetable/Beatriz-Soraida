@@ -13,7 +13,7 @@ Data on abundance, size and fishing pressure of California spiny lobster (Panuli
 ### Setup
 ```{r}
 #| warning: false
-#| comment: false
+#| message: false
 
 library(readr)
 library(dplyr)
@@ -24,6 +24,8 @@ library(tidyr)
 ### Read the data
 
 ```{r}
+#| warning: false
+
 lobster_traps <- read.csv("../data/Lobster_Trap_Counts_All_Years_20210519.csv")
 ```
 
@@ -62,13 +64,16 @@ Carp_20_traps <- lobster_traps %>%
 ## Exercise: Data Visualization
 
 ```{r}
+
 ggplot(data = lobster_traps, aes(x = TRAPS))+
-  geom_histogram()+
+  geom_histogram(bins = 15, na.rm = TRUE)+
   facet_wrap( ~ YEAR)
 
 ```
 
 ```{r}
+#| message: false
+
 lobsters_traps_summarize <- lobster_traps %>% 
   group_by(SITE, YEAR) %>% 
   summarize(TOTAL_TRAPS = sum(TRAPS, na.rm = TRUE))
@@ -92,6 +97,8 @@ ggplot(data = lobsters_traps_summarize, aes(x = YEAR,
 ### Bar graph
 
 ```{r}
+#| message: false
+
 lobster_traps_fishing_pressure <- lobster_traps %>% 
   filter(YEAR %in% c(2019, 2020, 2021)) %>% 
   mutate(FISHING_PRESSURE = if_else(TRAPS >=8,
