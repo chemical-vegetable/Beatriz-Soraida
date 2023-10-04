@@ -31,10 +31,29 @@ glimpse(lobster_traps)
 
 
 summary(lobster_traps)
+
+```
+
+## Convert missing values using `mutate()` and `na_if()`
+
+```{r}
+lobster_traps <- lobster_traps %>% 
+  mutate(TRAPS = na_if(TRAPS, -99999))
 ```
 
 
+## `filter()` practice
 
+```{r}
+not_napl <- lobster_traps %>% 
+  filter(SITE != "NAPL")
+```
+
+
+```{r}
+Carp_20_traps <- lobster_traps %>% 
+  filter(SITE == "CARP", TRAPS > 20)
+```
 
 
 
