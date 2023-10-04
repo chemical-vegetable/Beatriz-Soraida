@@ -10,21 +10,24 @@ format: html
 
 Data on abundance, size and fishing pressure of California spiny lobster (Panulirus interruptus) along the mainland coast of the Santa Barbara Channel from 2012-2021.
 
-## Setup
+### Setup
 ```{r}
+#| warning: false
+#| comment: false
+
 library(readr)
 library(dplyr)
 library(ggplot2)
 library(tidyr)
 ```
 
-## Read the data
+### Read the data
 
 ```{r}
 lobster_traps <- read.csv("../data/Lobster_Trap_Counts_All_Years_20210519.csv")
 ```
 
-## Exploring the data
+### Exploring the data
 
 ```{r}
 glimpse(lobster_traps)
@@ -34,7 +37,7 @@ summary(lobster_traps)
 
 ```
 
-## Convert missing values using `mutate()` and `na_if()`
+### Convert missing values using `mutate()` and `na_if()`
 
 ```{r}
 lobster_traps <- lobster_traps %>% 
@@ -42,7 +45,7 @@ lobster_traps <- lobster_traps %>%
 ```
 
 
-## `filter()` practice
+### `filter()` practice
 
 ```{r}
 not_napl <- lobster_traps %>% 
@@ -56,8 +59,66 @@ Carp_20_traps <- lobster_traps %>%
 ```
 
 
+## Exercise: Data Visualization
 
+```{r}
+ggplot(data = lobster_traps, aes(x = TRAPS))+
+  geom_histogram()+
+  facet_wrap( ~ YEAR)
 
+```
 
+```{r}
+lobsters_traps_summarize <- lobster_traps %>% 
+  group_by(SITE, YEAR) %>% 
+  summarize(TOTAL_TRAPS = sum(TRAPS, na.rm = TRUE))
+```
+### line plot
 
+```{r}
+ggplot(data = lobsters_traps_summarize, aes(x = YEAR,
+                                          y = TOTAL_TRAPS))+
+  geom_line(aes(color = SITE))
+```
+
+### line and point plot
+
+```{r}
+ggplot(data = lobsters_traps_summarize, aes(x = YEAR,
+                                            y = TOTAL_TRAPS))+
+  geom_point(aes(color = SITE))+
+  geom_line(aes(color = SITE))
+```
+### Bar graph
+
+```{r}
+lobster_traps_fishing_pressure <- lobster_traps %>% 
+  filter(YEAR %in% c(2019, 2020, 2021)) %>% 
+  mutate(FISHING_PRESSURE = if_else(TRAPS >=8,
+                                    true = "high",
+                                    false = "low")) %>% 
+  group_by(SITE, FISHING_PRESSURE) %>%
+  summarize(COUNT = n()) %>% 
+  drop_na()
+             
+```
+### Bar plot
+
+```{r}
+ggplot(data = lobster_traps_fishing_pressure,
+       aes(x = SITE,
+           y = COUNT,
+           fill = FISHING_PRESSURE))+
+  geom_col()
+```
+
+### Dodged bar plot
+
+```{r}
+ggplot(data = lobster_traps_fishing_pressure,
+       aes(x = SITE,
+           y = COUNT,
+           fill = FISHING_PRESSURE))+
+  geom_col(position = "dodge")
+```
 
