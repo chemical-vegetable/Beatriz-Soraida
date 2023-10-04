@@ -1,5 +1,44 @@
 ---
 title: "Collaborator Analysis"
+Author: Beatriz Mejia-Mercado
 format: html
 ---
+
+## Exercise: Explore, Clean, and Wrangle Data
+
+### About this data
+
+Data on abundance, size and fishing pressure of California spiny lobster (Panulirus interruptus) along the mainland coast of the Santa Barbara Channel from 2012-2021.
+
+## Setup
+```{r}
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+```
+
+## Read the data
+
+```{r}
+lobster_traps <- read.csv("../data/Lobster_Trap_Counts_All_Years_20210519.csv")
+```
+
+## Exploring the data
+
+```{r}
+glimpse(lobster_traps)
+
+
+summary(lobster_traps)
+```
+
+
+
+
+
+
+
+
+
 
