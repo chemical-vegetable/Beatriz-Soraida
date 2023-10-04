@@ -1,5 +1,28 @@
 ---
 title: "Owner Analysis"
+author: "Soraida"
 format: html
+
 ---
+
+## “Exercise: Explore, Clean, and Wrangle Data”
+
+```{r}
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+
+lobster_abundance<-read.csv("../data/Lobster_Abundance_All_Years_20220829.csv")
+
+
+
+
+
+```
+
+
+
+
+
 
